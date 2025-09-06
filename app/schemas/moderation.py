@@ -24,4 +24,4 @@ class ModerationResultResponse(BaseModel):
     llm_response: Optional[Dict] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
