@@ -1,15 +1,24 @@
 import hashlib
+from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from app.models.moderation_request import ModerationRequest, ContentType, RequestStatus
 from app.models.moderation_result import ModerationResult
-from app.schemas.moderation import ModerationTextRequest, ModerationImageRequest, ModerationResultResponse
+from app.schemas.moderation import (
+    ModerationTextRequest,
+    ModerationImageRequest,
+    ModerationResultResponse,
+)
 from app.services.notification_service import send_inappropriate_content_alert
 from app.clients.llm_client import classify_text, classify_image
+
 
 def hash_content(content: str) -> str:
     return hashlib.sha256(content.encode()).hexdigest()
 
-def handle_text_moderation(request: ModerationTextRequest, db: Session) -> ModerationResultResponse:
+
+def handle_text_moderation(
+    request: ModerationTextRequest, db: Session, background_tasks: BackgroundTasks
+) -> ModerationResultResponse:
     content_hash = hash_content(request.content)
     moderation_request = ModerationRequest(
         user_email=request.email,
@@ -36,12 +45,13 @@ def handle_text_moderation(request: ModerationTextRequest, db: Session) -> Moder
     db.refresh(result)
 
     if classification != "safe":
-        send_inappropriate_content_alert(
+        background_tasks.add_task(
+            send_inappropriate_content_alert,
             to_email=request.email,
             classification=classification,
             reasoning=reasoning,
             db=db,
-            request_id=moderation_request.id
+            request_id=moderation_request.id,
         )
 
     return ModerationResultResponse(
@@ -50,10 +60,13 @@ def handle_text_moderation(request: ModerationTextRequest, db: Session) -> Moder
         confidence=confidence,
         reasoning=reasoning,
         status=moderation_request.status.value,
-        llm_response=llm_response
+        llm_response=llm_response,
     )
 
-def handle_image_moderation(request: ModerationImageRequest, db: Session) -> ModerationResultResponse:
+
+def handle_image_moderation(
+    request: ModerationImageRequest, db: Session, background_tasks: BackgroundTasks
+) -> ModerationResultResponse:
     content_hash = hash_content(request.image_url)
     moderation_request = ModerationRequest(
         user_email=request.email,
@@ -65,7 +78,9 @@ def handle_image_moderation(request: ModerationImageRequest, db: Session) -> Mod
     db.commit()
     db.refresh(moderation_request)
 
-    classification, confidence, reasoning, llm_response = classify_image(request.image_url)
+    classification, confidence, reasoning, llm_response = classify_image(
+        request.image_url
+    )
 
     result = ModerationResult(
         request_id=moderation_request.id,
@@ -80,12 +95,13 @@ def handle_image_moderation(request: ModerationImageRequest, db: Session) -> Mod
     db.refresh(result)
 
     if classification != "safe":
-        send_inappropriate_content_alert(
+        background_tasks.add_task(
+            send_inappropriate_content_alert,
             to_email=request.email,
             classification=classification,
             reasoning=reasoning,
             db=db,
-            request_id=moderation_request.id
+            request_id=moderation_request.id,
         )
 
     return ModerationResultResponse(
@@ -94,5 +110,5 @@ def handle_image_moderation(request: ModerationImageRequest, db: Session) -> Mod
         confidence=confidence,
         reasoning=reasoning,
         status=moderation_request.status.value,
-        llm_response=llm_response
+        llm_response=llm_response,
     )
