@@ -7,7 +7,7 @@ app = FastAPI(title="Smart Content Moderator API")
 from app.db.base import *  # This imports all models
 
 # Include routers
-app.include_router(moderation.router, prefix="/api/v1/moderate", tags=["moderation"])
+app.include_router(moderation.router, tags=["moderation"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 
 # Add database initialization endpoint
