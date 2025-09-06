@@ -9,13 +9,13 @@ from app.db.session import Base
 class ModerationResult(Base):
     __tablename__ = "moderation_results"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     request_id = Column(UUID(as_uuid=True), ForeignKey("moderation_requests.id", ondelete="CASCADE"), nullable=False)
+    classification = Column(String, nullable=False)
+    confidence = Column(Float)
+    reasoning = Column(Text)
+    llm_response = Column(JSON)
 
-    classification = Column(String, nullable=False)  # toxic, spam, harassment, safe
-    confidence = Column(Float, nullable=True)
-    reasoning = Column(Text, nullable=True)
-    llm_response = Column(JSON, nullable=True)  # store raw LLM response
 
     # Relationship
     request = relationship("ModerationRequest", back_populates="results")
