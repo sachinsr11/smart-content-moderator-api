@@ -102,16 +102,16 @@ def validate_image_url(url: str) -> Tuple[bool, Optional[str]]:
         return False, "Invalid URL format"
     
     # Check for common image file extensions
-    image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp']
-    if not any(url.lower().endswith(ext) for ext in image_extensions):
-        logger.warning(f"Image URL doesn't have common image extension: {url}")
+    valid_extensions = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".tiff")
+    if not any(url.lower().endswith(ext) for ext in valid_extensions):
+        return False, "URL does not have a valid image extension"
     
     return True, None
 
 def check_rate_limit(client_ip: str) -> bool:
     """
     Check if client has exceeded rate limit.
-    
+        return False, "Image URL must end with a common image extension (.jpg, .jpeg, .png, .gif, .webp, .bmp)"
     Args:
         client_ip: Client IP address
         

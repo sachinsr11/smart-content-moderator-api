@@ -183,7 +183,8 @@ async def health_check():
         # Check database connectivity
         from app.db.session import get_db
         db = next(get_db())
-        db.execute("SELECT 1")
+        from sqlalchemy import text
+        db.execute(text("SELECT 1"))
         
         return {
             "status": "healthy",
