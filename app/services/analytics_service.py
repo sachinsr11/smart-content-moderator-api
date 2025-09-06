@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.models.moderation_request import ModerationRequest
 from app.models.moderation_result import ModerationResult
 from app.schemas.analytics import AnalyticsSummary
-from sqlalchemy import func
 
 def get_user_summary(user_email: str, db: Session) -> AnalyticsSummary:
     total = db.query(func.count(ModerationRequest.id)).filter(
