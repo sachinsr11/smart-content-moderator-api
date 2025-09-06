@@ -19,7 +19,9 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Content Moderator API", extra={"version": "1.0.0"})
     
     # Import all models to ensure they are registered with SQLAlchemy
-    from app.db.base import *  # This imports all models
+    from app.models.moderation_request import ModerationRequest
+    from app.models.moderation_result import ModerationResult
+    from app.models.notification_log import NotificationLog
     
     # Initialize database if needed
     try:
