@@ -36,7 +36,7 @@ class LLMServiceException(ContentModeratorException):
         super().__init__(
             message=message,
             error_code="LLM_SERVICE_ERROR",
-            details={**details or {}, "provider": provider}
+            details={**(details or {}), "provider": provider}
         )
 
 
@@ -52,7 +52,7 @@ class NotificationServiceException(ContentModeratorException):
         super().__init__(
             message=message,
             error_code="NOTIFICATION_SERVICE_ERROR",
-            details={**details or {}, "channel": channel}
+            details={**(details or {}), "channel": channel}
         )
 
 
@@ -68,7 +68,7 @@ class DatabaseException(ContentModeratorException):
         super().__init__(
             message=message,
             error_code="DATABASE_ERROR",
-            details={**details or {}, "operation": operation}
+            details={**(details or {}), "operation": operation}
         )
 
 
@@ -84,7 +84,7 @@ class ValidationException(ContentModeratorException):
         super().__init__(
             message=message,
             error_code="VALIDATION_ERROR",
-            details={**details or {}, "field": field}
+            details={**(details or {}), "field": field}
         )
 
 
@@ -100,7 +100,7 @@ class RateLimitException(ContentModeratorException):
         super().__init__(
             message=message,
             error_code="RATE_LIMIT_EXCEEDED",
-            details={**details or {}, "retry_after": retry_after}
+            details={**(details or {}), "retry_after": retry_after}
         )
 
 
@@ -118,8 +118,8 @@ class ContentTooLargeException(ContentModeratorException):
             message=message,
             error_code="CONTENT_TOO_LARGE",
             details={
-                **details or {}, 
-                "max_size": max_size, 
+                **(details or {}), 
+                "max_size": max_size,
                 "actual_size": actual_size
             }
         )
